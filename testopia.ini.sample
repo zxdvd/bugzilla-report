@@ -1,0 +1,7 @@
+[testopia]
+api=https://apibugzilla.novell.com/xmlrpc.cgi
+user=username
+passwd=password
+
+[mongodb]
+uri=URI_OF_MONGODB

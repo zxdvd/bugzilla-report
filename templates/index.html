@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript">
+</script>
+<h3>{{ escape(person) }}</h3>
+<div class="list-group" id="cases">
+  {% for (run,run_details) in items.items() %}
+  <div class="list-group-item">
+      <h4 class="list-group-item-heading">
+          <a href="https://bugzilla.suse.com/tr_show_run.cgi?run_id={{ run }}">
+              Run {{ run }} - {{ run_details['summary'] }}</a>
+          <div class="dropdown pull-right">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" 
+                    data-toggle="dropdown" aria-expanded="true">
+            Action
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1"
+                      href="#">Expired This Run</a></li>
+            </ul>
+          </div>
+      </h4>  
+      {% for case in run_details['cases'] %}
+        <a class="list-group-item-text" href="https://bugzilla.suse.com/tr_show_case.cgi?case_id=
+                  {{ case['case_id'] }}">{{ case['summary'] }}</a>
+        <p class="list-group-item-text">Status: {{ case['case_run_status_id'] }}</p>
+        <p class="list-group-item-text"> Bugs:
+        {% for bug in case['bugs'] %}
+        <a href="https://bugzilla.suse.com/show_bug.cgi?id={{ bug['bug_id'] }}">{{ bug['bug_id'] }}</a>
+        {% end %}
+        </p>
+      {% end %}
+  </div>
+  {% end %}
+</div>
+{% end %}
