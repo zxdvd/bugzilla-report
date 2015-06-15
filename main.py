@@ -1,11 +1,21 @@
-import datetime
-import json
 
 import tornado.ioloop
 import tornado.web
 
 import util
 from util import mongo_tt, proxy
+
+class IndexHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('index.html')
+
+class ExpireRunHandler(tornado.web.RequestHandler):
+    def get(self, runid):
+        try:
+            mongo_tt.update_one({'name':'runs', 'run_id': int(runid)},
+                    {'$set': {'expire':1}})
+        except:
+            pass
 
 class PersonHandler(tornado.web.RequestHandler):
 
@@ -16,7 +26,7 @@ class PersonHandler(tornado.web.RequestHandler):
                 person = person + '@suse.com'
             userid, realname = util.get_id_by_email(person)
             #get all UNPASSED case_run of person
-            assigned = mongo_tt.find({'name':'case_run', 'assignee':userid,
+            all_case_run= mongo_tt.find({'name':'case_run', 'assignee':userid,
                             'iscurrent':1, 'case_run_status_id':{'$ne':2}})
 
             items={}
@@ -26,35 +36,44 @@ class PersonHandler(tornado.web.RequestHandler):
                                 {case2....}]},
              runid_2: {'summary':'summary_of_run',...}
             }'''
-            for i in assigned:
+            #get expired runs
+            expired_run = []
+            for i in mongo_tt.find({'name':'runs', 'expire':1}, {'run_id':1}):
+                expired_run.append(i['run_id'])
+
+            for i in all_case_run:
                 i.pop('_id')
+
+                #escape cases in expired run
                 run_id = i.pop('run_id')
+                if run_id in expired_run:
+                    continue
+
                 item = items.setdefault(run_id, {})
-
-                case_run_status = i['case_run_status_id']
-                i['case_run_status_id'] = self.status[case_run_status - 1]
-
                 #get summary of run
                 if 'summary' not in item:
                     run_info = mongo_tt.find_one({'name':'runs', 'run_id':run_id})
                     run_summary = run_info.get('summary')
                     item['summary'] = run_summary
 
+                case_run_status = i['case_run_status_id']
+                i['case_run_status_id'] = self.status[case_run_status - 1]
+
                 #show bugs of test case
                 bugs = mongo_tt.find({'name':'bugs', 'case_id':i['case_id']},
                         {'_id':0, 'bug_id':1, 'bug_status':1, 'short_desc':1})
                 if 'bugs' not in i:
                     i['bugs'] = [bug for bug in bugs]
-                    print(i['bugs'])
 
                 item_cases = item.setdefault('cases', [])
                 item_cases.append(i)
-            self.render('index.html', person=realname, items=items)
+            self.render('person.html', person=realname, items=items)
 
 if __name__ == '__main__':
     app = tornado.web.Application([
-        (r'/([\d\w]+)', PersonHandler),
-        #(r'/ajax/([\d\w]+)', AjaxPersonHandler),
+        (r'/', IndexHandler),
+        (r'/expirerun/([\d]+)', ExpireRunHandler),
+        (r'/([.@\d\w]+)', PersonHandler),
         ], debug=True, template_path='templates')
     app.listen(8010)
     tornado.ioloop.IOLoop.instance().start()
