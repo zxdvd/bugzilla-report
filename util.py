@@ -18,6 +18,7 @@ proxy = ServerProxy(uri, use_datetime=True)
 mongo_uri = config['mongodb']['uri']
 mongo_client = MongoClient('mongodb://%s' % mongo_uri)
 mongo_tt = mongo_client.tt.cases
+mongo_bz = mongo_client.bz.prods
 
 def double_find(func):
     '''this is a wrapper. if the func return None then re-execute again.'''

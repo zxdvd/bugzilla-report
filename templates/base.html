@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Testopia</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -9,8 +10,8 @@
 
   <body>
     <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#">Testopia</a></li>
-        <li role="presentation"><a href="#">Bugzilla</a></li>
+        <li role="presentation" class="active"><a href="#test" role="tab" data-toggle="tab">Testopia</a></li>
+        <li role="presentation"><a href="#bug" role="tab" data-toggle="tab">Bugzilla</a></li>
     </ul>
     {% block body %}{% end %}
   </body>
