@@ -1,6 +1,8 @@
+import json
 
 import tornado.ioloop
 import tornado.web
+from bson import json_util
 
 import util
 from util import mongo_bz, mongo_tt, proxy
@@ -16,6 +18,11 @@ class ExpireRunHandler(tornado.web.RequestHandler):
                     {'$set': {'expire':1}})
         except:
             pass
+
+class GetbugHandler(tornado.web.RequestHandler):
+    def get(self, bugid):
+        bug = mongo_bz.find_one({'_id': int(bugid)})
+        self.write(json.dumps(bug, default=json_util.default))
 
 class PersonHandler(tornado.web.RequestHandler):
 
@@ -70,7 +77,8 @@ class PersonHandler(tornado.web.RequestHandler):
     @staticmethod
     def get_bugs(email):
         bugs = {}
-        results = mongo_bz.find({'creator':email, 'is_open': True})
+        results = mongo_bz.find({'creator':email, 'is_open': True},
+                    {'status':1, 'summary':1, 'product':1})
         for item in results:
             prod = item.pop('product')
             item_bugs = bugs.setdefault(prod, [])
@@ -89,6 +97,7 @@ class PersonHandler(tornado.web.RequestHandler):
 if __name__ == '__main__':
     app = tornado.web.Application([
         (r'/', IndexHandler),
+        (r'/ajax/getbug/([\d]+)', GetbugHandler),
         (r'/expirerun/([\d]+)', ExpireRunHandler),
         (r'/([.@\d\w]+)', PersonHandler),
         ], debug=True, template_path='templates')

@@ -1,0 +1,48 @@
+{# Block for Tab bugs, included in person.html#}
+<script type="text/javascript">
+  $(function () {
+      $('a[data-target="#modalBugDetail"]').click(function() {
+          var bugid = $(this).prevAll('a').first().html();
+
+          $.getJSON("/ajax/getbug" + "/" + bugid, function(data) {
+              var cmmts = [];
+              cmmts.push("<h4><b>"+data['summary']+"</b></h4>");
+              cmmts.push("<p>"+data['priority']+" "+data['status']+"</p>");
+              $.each(data['comments'], function(i, comment) {
+                  cmmts.push("<p>"+comment['author']+"</p>");
+                  cmmts.push("<pre>"+comment['text']+"</pre>");
+              });
+              $("#modal-detail").empty().append(cmmts);
+          });
+      });
+  });
+</script>
+
+<div role="tabpanel" class="tab-pane" id='bug'>
+  <div class="list-group" id="bugs">
+      {% for (prod, bgs) in bugs.items() %}
+      <div class="list-group-item">
+          <h4 class="list-group-item-heading"> {{ prod }} </h4>
+          {% for bg in bgs %}
+            <a class=list-group-item-text href="https://bugzilla.suse.com/show_bug.cgi?id=
+              {{ bg['_id'] }}">{{ bg['_id'] }}</a> - <strong>[{{ bg['status'] }}]</strong> - 
+              <a href="#" data-toggle="modal" data-target="#modalBugDetail">{{ bg['summary'] }}</a>
+            <p></p>
+          {% end %}
+      </div>
+      {% end %}
+  </div>
+</div>
+
+<!--Modal dialog to show detail of a specific bug-->
+<div class="modal fade" id="modalBugDetail" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div id="modal-detail"></div>
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
