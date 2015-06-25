@@ -91,7 +91,7 @@ class PersonHandler(tornado.web.RequestHandler):
             userid, realname = util.get_id_by_email(person)
             testcases = self.get_cases(userid)
             bugs = self.get_bugs(person)
-            self.render('person.html', realname=realname, testcases=testcases,
+            self.render('personal-center.html', realname=realname, testcases=testcases,
                     bugs=bugs)
 
 if __name__ == '__main__':

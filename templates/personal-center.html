@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript">
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+
+
+<div class="tab-content">
+
+  {#Include the block for Tab Testopia#}
+  {% include testopia.html %}
+
+  {#Include the block for Tab Bugs#}
+  {% include bugs.html %}
+
+  {#Include the block for Tab Settings#}
+  {% include settings.html %}
+
+</div>
+
+{% end %}

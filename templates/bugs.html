@@ -19,6 +19,7 @@
 </script>
 
 <div role="tabpanel" class="tab-pane" id='bug'>
+  <h3>{{ escape(realname) }}</h3>
   <div class="list-group" id="bugs">
       {% for (prod, bgs) in bugs.items() %}
       <div class="list-group-item">
