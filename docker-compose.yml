@@ -1,0 +1,9 @@
+web:
+    build: .
+    restart: always
+    command: python main.py
+    volumes:
+        - .:/code
+    ports:
+        - "8010:8010"
+
